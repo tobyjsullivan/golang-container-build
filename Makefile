@@ -1,3 +1,9 @@
+SHELL = bash
+GOOS = darwin
+GOARCH = amd64
+APP_NAME = build-container
+OUT_FILE = app
+
 define DOCKERFILE
 FROM golang:1
 
@@ -5,14 +11,11 @@ WORKDIR /go/src/app
 ADD ./src .
 
 RUN go get -d -v ./...
-ENV GOOS darwin
-ENV GOARCH amd64
+ENV GOOS "$(GOOS)"
+ENV GOARCH "$(GOARCH)"
 RUN go install -v ./...
 endef
 
-SHELL = bash
-APP_NAME = build-container
-OUT_FILE = app
 
 export DOCKERFILE
 build:
