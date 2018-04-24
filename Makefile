@@ -10,12 +10,13 @@ ENV GOARCH amd64
 RUN go install -v ./...
 endef
 
+SHELL = bash
 APP_NAME = build-container
 OUT_FILE = app
 
 export DOCKERFILE
 build:
-	bash -c 'docker build --tag "$(APP_NAME)" --file <(echo "$$DOCKERFILE") .'
+	docker build --tag "$(APP_NAME)" --file <(echo "$$DOCKERFILE") .
 	docker run "$(APP_NAME)" cat /go/bin/darwin_amd64/app > "bin/$(OUT_FILE)"
 	chmod u+x "bin/$(OUT_FILE)"
 
