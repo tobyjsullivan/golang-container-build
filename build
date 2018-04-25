@@ -7,14 +7,15 @@ usage() {
 usage: ${prog} [OPTIONS]
 
 Options:
-      --arch arch   The target architecture to build for. For example, '386', 'amd64', 'arm', 'arm64'.
+      --arch <arch> The target architecture to build for. For example, '386', 'amd64', 'arm', 'arm64'.
                     See all options and valid os/arch combinations at https://golang.org/doc/install/source#environment.
                     Default 'amd64'.
-      --os os       The target os to build for. For example, 'darwin' (mac OS), 'linux', or 'windows'.
+  -h, --help        Print these usage instructions.
+      --os <os>     The target os to build for. For example, 'darwin' (mac OS), 'linux', or 'windows'.
                     See all options at https://golang.org/doc/install/source#environment.
                     Default 'darwin'.
-  -o, --out file    The destination of the built binary. Default './bin/app'
-  -h, --help        Print these usage instructions.
+  -o, --out <file>  The destination of the built binary. Default './bin/app'.
+      --src <dir>   The path to source directory. Default './src'.
 EOF
 }
 
@@ -22,19 +23,20 @@ build_container() {
   local container_tag="$1"
   local os="$2"
   local arch="$3"
+  local src_dir="$4"
 
   docker build --tag "${container_tag}" --file <(cat <<DOCKERFILE
 FROM golang:1
 
 WORKDIR /go/src/app
-ADD ./src .
+ADD . .
 
 ENV GOOS=${os}
 ENV GOARCH=${arch}
 RUN go get -d -v ./...
 RUN go build -o /go/bin/app -v ./...
 DOCKERFILE
-) .
+) "${src_dir}"
 }
 
 extract_app() {
@@ -50,6 +52,7 @@ main() {
   local target_os="darwin"
   local target_arch="amd64"
   local out_file="bin/app"
+  local src_dir="src/"
 
   while [[ "$#" -gt "0" ]]; do
     case "$1" in
@@ -69,12 +72,18 @@ main() {
         usage
         exit
         ;;
+      --src)
+        src_dir="$2"
+        shift
+        ;;
     esac
     shift
   done
 
-  build_container "${container_tag}" "${target_os}" "${target_arch}"
+  build_container "${container_tag}" "${target_os}" "${target_arch}" "${src_dir}"
   extract_app "${container_tag}" "${out_file}"
+
+  echo "Build complete. Binary: ${out_file}"
 }
 
 main "$@"
