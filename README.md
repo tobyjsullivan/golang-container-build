@@ -30,7 +30,7 @@ The default source directory (`./src`) is intended for using this script within 
 You can specify any alternative go project with the `--src` argument.
 
 ```
-./bin --src ~/go/src/github.com/tools/godep/
+./build --src ~/go/src/github.com/tools/godep/
 ```
 
 ### Other OS's and Architectures
