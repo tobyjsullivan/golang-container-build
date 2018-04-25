@@ -6,6 +6,9 @@ usage() {
   cat <<EOF
 usage: ${prog} [OPTIONS]
 
+Build a go binary for any architecture within a Docker container.
+You do not need golang installed or configured locally.
+
 Options:
       --arch <arch> The target architecture to build for. For example, '386', 'amd64', 'arm', 'arm64'.
                     See all options and valid os/arch combinations at https://golang.org/doc/install/source#environment.
@@ -17,6 +20,17 @@ Options:
   -o, --out <file>  The destination of the built binary. Default './bin/app'.
       --src <dir>   The path to source directory. Default './src'.
 EOF
+}
+
+err() {
+  echo "$@"
+}
+
+prereq_check() {
+  if ! which docker; then
+    err "You must have docker installed."
+    exit 1
+  fi
 }
 
 build_container() {
@@ -80,10 +94,12 @@ main() {
     shift
   done
 
+  prereq_check
   build_container "${container_tag}" "${target_os}" "${target_arch}" "${src_dir}"
   extract_app "${container_tag}" "${out_file}"
 
-  echo "Build complete. Binary: ${out_file}"
+  echo "Build complete."
+  echo "Binary: ${out_file}"
 }
 
 main "$@"
