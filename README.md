@@ -10,7 +10,7 @@ You can build the example app with make.
 The code currently assumes you are wanting to build for Mac OS.
 
 ```
-make build
+./build.sh
 ```
 
 And then you can run the app directly.
